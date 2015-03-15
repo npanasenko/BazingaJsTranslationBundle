@@ -35,7 +35,7 @@ class Controller
     /**
      * @var array
      */
-    private $loaders = array();
+    private $loaders = [];
 
     /**
      * @var string
@@ -62,39 +62,40 @@ class Controller
     private $httpCacheTime;
 
     /**
-     * @param TranslatorInterface $translator        The translator.
-     * @param EngineInterface     $engine            The engine.
-     * @param TranslationFinder   $translationFinder The translation finder.
-     * @param string              $cacheDir
-     * @param boolean             $debug
-     * @param string              $localeFallback
-     * @param string              $defaultDomain
-     * @param int                 $httpCacheTime
+     * @param TranslatorInterface $translator      The translator.
+     * @param EngineInterface $engine              The engine.
+     * @param TranslationFinder $translationFinder The translation finder.
+     * @param string $cacheDir
+     * @param boolean $debug
+     * @param string $localeFallback
+     * @param string $defaultDomain
+     * @param int $httpCacheTime
      */
     public function __construct(
         TranslatorInterface $translator,
         EngineInterface $engine,
         TranslationFinder $translationFinder,
         $cacheDir,
-        $debug          = false,
+        $debug = false,
         $localeFallback = '',
-        $defaultDomain  = '',
-        $httpCacheTime  = 86400
-    ) {
-        $this->translator        = $translator;
-        $this->engine            = $engine;
+        $defaultDomain = '',
+        $httpCacheTime = 86400
+    )
+    {
+        $this->translator = $translator;
+        $this->engine = $engine;
         $this->translationFinder = $translationFinder;
-        $this->cacheDir          = $cacheDir;
-        $this->debug             = $debug;
-        $this->localeFallback    = $localeFallback;
-        $this->defaultDomain     = $defaultDomain;
-        $this->httpCacheTime     = $httpCacheTime;
+        $this->cacheDir = $cacheDir;
+        $this->debug = $debug;
+        $this->localeFallback = $localeFallback;
+        $this->defaultDomain = $defaultDomain;
+        $this->httpCacheTime = $httpCacheTime;
     }
 
     /**
      * Add a translation loader if it does not exist.
      *
-     * @param string          $id     The loader id.
+     * @param string $id              The loader id.
      * @param LoaderInterface $loader A translation loader.
      */
     public function addLoader($id, $loader)
@@ -113,18 +114,18 @@ class Controller
         }
 
         $cache = new ConfigCache(sprintf('%s/%s.%s.%s',
-            $this->cacheDir,
-            $domain,
-            implode('-', $locales),
-            $_format
-        ), $this->debug);
+                                         $this->cacheDir,
+                                         $domain,
+                                         implode('-', $locales),
+                                         $_format
+                                 ), $this->debug);
 
         if (!$cache->isFresh()) {
-            $resources    = array();
-            $translations = array();
+            $resources = [];
+            $translations = [];
 
             foreach ($locales as $locale) {
-                $translations[$locale] = array();
+                $translations[$locale] = [];
 
                 $files = $this->translationFinder->get($domain, $locale);
 
@@ -132,14 +133,14 @@ class Controller
                     continue;
                 }
 
-                $translations[$locale][$domain] = array();
+                $translations[$locale][$domain] = [];
 
                 foreach ($files as $file) {
                     $extension = pathinfo($file->getFilename(), \PATHINFO_EXTENSION);
 
                     if (isset($this->loaders[$extension])) {
                         $resources[] = new FileResource($file->getPath());
-                        $catalogue   = $this->loaders[$extension]
+                        $catalogue = $this->loaders[$extension]
                             ->load($file, $locale, $domain);
 
                         $translations[$locale][$domain] = array_replace_recursive(
@@ -150,12 +151,12 @@ class Controller
                 }
             }
 
-            $content = $this->engine->render('BazingaJsTranslationBundle::getTranslations.' . $_format . '.twig', array(
+            $content = $this->engine->render('BazingaJsTranslationBundle::getTranslations.' . $_format . '.twig', [
                 'fallback'       => $this->localeFallback,
                 'defaultDomain'  => $this->defaultDomain,
                 'translations'   => $translations,
                 'include_config' => true,
-            ));
+            ]);
 
             try {
                 $cache->write($content, $resources);
@@ -169,7 +170,7 @@ class Controller
         $response = new Response(
             file_get_contents((string) $cache),
             200,
-            array('Content-Type' => $request->getMimeType($_format))
+            ['Content-Type' => $request->getMimeType($_format)]
         );
         $response->prepare($request);
         $response->setPublic();
@@ -180,12 +181,23 @@ class Controller
         return $response;
     }
 
+    public function getMultipleTranslationsAction(Request $request, $domains, $_format)
+    {
+        $responses = [];
+        foreach (explode(',', $domains) as $domain) {
+            $responses[] = $this->getTranslationsAction($request, $domain, $_format)->getContent();
+        }
+
+        return new Response(implode('', $responses));
+    }
+
     private function getLocales(Request $request)
     {
         if (null !== $locales = $request->query->get('locales')) {
             $locales = explode(',', $locales);
-        } else {
-            $locales = array($request->getLocale());
+        }
+        else {
+            $locales = [$request->getLocale()];
         }
 
         $locales = array_filter($locales, function ($locale) {

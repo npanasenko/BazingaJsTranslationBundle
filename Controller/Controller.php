@@ -169,7 +169,7 @@ class Controller
         $expirationTime = new \DateTime();
         $expirationTime->modify('+' . $this->httpCacheTime . ' seconds');
         $response = new Response(
-            file_get_contents((string) $cache),
+            file_get_contents($cache->getPath()),
             200,
             ['Content-Type' => $request->getMimeType($_format)]
         );

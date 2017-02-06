@@ -3,7 +3,8 @@
 namespace Bazinga\Bundle\JsTranslationBundle\Dumper;
 
 use Bazinga\Bundle\JsTranslationBundle\Finder\TranslationFinder;
-use Symfony\Component\Templating\EngineInterface;
+use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
+use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Filesystem\Filesystem;
 
@@ -58,12 +59,14 @@ class TranslationDumper
     private $defaultDomain;
 
     /**
-     * @param EngineInterface   $engine         The engine.
-     * @param TranslationFinder $finder         The translation finder.
-     * @param RouterInterface   $router         The router.
-     * @param FileSystem        $filesystem     The file system.
-     * @param string            $localeFallback
-     * @param string            $defaultDomain
+     * @param EngineInterface $engine The engine.
+     * @param TranslationFinder $finder The translation finder.
+     * @param RouterInterface $router The router.
+     * @param FileSystem $filesystem The file system.
+     * @param string $localeFallback
+     * @param string $defaultDomain
+     * @param array $activeLocales
+     * @param array $activeDomains
      */
     public function __construct(
         EngineInterface $engine,

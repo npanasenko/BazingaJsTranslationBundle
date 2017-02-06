@@ -3,8 +3,9 @@
 namespace Bazinga\Bundle\JsTranslationBundle\Controller;
 
 use Bazinga\Bundle\JsTranslationBundle\Finder\TranslationFinder;
-use Symfony\Component\Translation\TranslatorInterface;
-use Symfony\Component\Templating\EngineInterface;
+use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
+use Symfony\Bundle\FrameworkBundle\Translation\Translator;
+use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Config\ConfigCache;
@@ -18,12 +19,12 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 class Controller
 {
     /**
-     * @var TranslatorInterface
+     * @var Translator
      */
     private $translator;
 
     /**
-     * @var EngineInterface
+     * @var Translator
      */
     private $engine;
 
@@ -62,7 +63,7 @@ class Controller
     private $httpCacheTime;
 
     /**
-     * @param TranslatorInterface $translator      The translator.
+     * @param Translator $translator      The translator.
      * @param EngineInterface $engine              The engine.
      * @param TranslationFinder $translationFinder The translation finder.
      * @param string $cacheDir
@@ -72,7 +73,7 @@ class Controller
      * @param int $httpCacheTime
      */
     public function __construct(
-        TranslatorInterface $translator,
+        Translator $translator,
         EngineInterface $engine,
         TranslationFinder $translationFinder,
         $cacheDir,

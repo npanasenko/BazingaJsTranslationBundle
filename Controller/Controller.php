@@ -4,7 +4,6 @@ namespace Bazinga\Bundle\JsTranslationBundle\Controller;
 
 use Bazinga\Bundle\JsTranslationBundle\Finder\TranslationFinder;
 use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
-use Symfony\Bundle\FrameworkBundle\Translation\Translator;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
@@ -12,6 +11,7 @@ use Symfony\Component\Config\ConfigCache;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * @author William DURAND <william.durand1@gmail.com>
@@ -19,12 +19,12 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 class Controller
 {
     /**
-     * @var Translator
+     * @var TranslatorInterface
      */
     private $translator;
 
     /**
-     * @var Translator
+     * @var EngineInterface
      */
     private $engine;
 
@@ -63,7 +63,7 @@ class Controller
     private $httpCacheTime;
 
     /**
-     * @param Translator $translator      The translator.
+     * @param TranslatorInterface $translator      The translator.
      * @param EngineInterface $engine              The engine.
      * @param TranslationFinder $translationFinder The translation finder.
      * @param string $cacheDir
@@ -73,7 +73,7 @@ class Controller
      * @param int $httpCacheTime
      */
     public function __construct(
-        Translator $translator,
+        TranslatorInterface $translator,
         EngineInterface $engine,
         TranslationFinder $translationFinder,
         $cacheDir,
